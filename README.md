@@ -1,17 +1,7 @@
-等我有空了再写
+使用方法：
 
-元信息如下：
+1. 安装油猴脚本浏览器扩展，在扩展应用商店搜索“篡改猴”进行安装
 
-```javascript
-// ==UserScript==
-// @name         ECNUPrettier
-// @namespace    http://santonin.top/
-// @version      2025-05-12
-// @description  Make ECNU Website Great Again !
-// @author       Santonin
-// @match        https://applicationnewjw.ecnu.edu.cn/eams/home.action*
-// @match        https://applicationnewjw.ecnu.edu.cn/eams/myPlanCompl.action*
-// @icon         data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==
-// @grant        none
-// ==/UserScript==
-```
+2. 访问油叉 https://greasyfork.org/zh-CN/ ，搜索“santonin1989”，即可看到脚本“ECNUPrettier”，进行安装
+
+3. 如果不起作用，可能需要您开启浏览器的开发者模式

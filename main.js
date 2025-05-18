@@ -1,3 +1,16 @@
+// ==UserScript==
+// @name         ECNUPrettier
+// @namespace    http://santonin.top/
+// @version      2025-05-12
+// @description  Make ECNU Website Great Again !
+// @author       Santonin
+// @match        https://applicationnewjw.ecnu.edu.cn/eams/home.action*
+// @match        https://applicationnewjw.ecnu.edu.cn/eams/myPlanCompl.action*
+// @icon         data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==
+// @grant        none
+// @license      GPL-3.0-or-later; https://www.gnu.org/licenses/gpl-3.0.txt
+// ==/UserScript==
+
 let tableData = [];
 
 /** 重新累加计算每个非叶子节点的 leafNum */
