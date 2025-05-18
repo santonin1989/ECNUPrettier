@@ -1,11 +1,13 @@
 // ==UserScript==
 // @name         ECNUPrettier
 // @namespace    http://santonin.top/
-// @version      1.1
+// @version      1.1.1
 // @description  Make ECNU Website Great Again !
 // @author       Santonin
 // @match        https://applicationnewjw.ecnu.edu.cn/eams/home.action*
 // @match        https://applicationnewjw.ecnu.edu.cn/eams/myPlanCompl.action*
+// @require      https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js
+// @require      https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js
 // @icon         data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==
 // @grant        none
 // @license      GPL-3.0-or-later; https://www.gnu.org/licenses/gpl-3.0.txt
