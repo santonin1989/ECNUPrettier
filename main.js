@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ECNUPrettier
 // @namespace    http://santonin.top/
-// @version      1.0
+// @version      1.1
 // @description  Make ECNU Website Great Again !
 // @author       Santonin
 // @match        https://applicationnewjw.ecnu.edu.cn/eams/home.action*
@@ -88,7 +88,7 @@ function foldItems(items) {
 }
 
 /** 表格渲染函数 */
-function renderTable(data) {
+function renderTable(data, isExportMode = false) {
   const $table = $('<table>').css({
     width: '100%',
     borderCollapse: 'collapse',
@@ -152,7 +152,7 @@ function renderTable(data) {
         alignItems: 'center',
         gap: '8px',
       })
-      .append($('<p>').css({ margin: 0 }).text(data.name))
+      .append($('<p>').css({ margin: 0, fontSize: '14px' }).text(data.name))
       .append(renderCreditUI(data));
     return $('<div>')
       .css({
@@ -164,7 +164,7 @@ function renderTable(data) {
       .append(content);
   }
 
-  function renderSideHeader(data) {
+  function renderLeafHeader(data) {
     const content = $('<div>')
       .css({
         display: 'flex',
@@ -172,7 +172,7 @@ function renderTable(data) {
         alignItems: 'center',
         gap: '8px',
       })
-      .append($('<p>').css({ margin: 0 }).text(data.name))
+      .append($('<p>').css({ margin: 0, fontSize: '14px' }).text(data.name))
       .append(renderCreditUI(data));
 
     const res = $('<div>');
@@ -195,13 +195,14 @@ function renderTable(data) {
       data.isFold = !data.isFold;
       rerender();
     });
-    return res.append(content).append(btn);
+    if (isExportMode) return res.append(content);
+    else return res.append(content).append(btn);
   }
 
-  function renderFirstKind(kind, isLeaf = false) {
+  function renderHeader(kind, isLeaf = false) {
     if (isLeaf)
       return $('<td>')
-        .html(renderSideHeader(kind))
+        .html(renderLeafHeader(kind))
         .css(tdStyle)
         .attr('rowspan', kind.leafNum);
     else
@@ -271,12 +272,12 @@ function renderTable(data) {
             if (kind3.isFold) {
               let row = $('<tr>');
               if (index2 === 0) {
-                row.append(renderFirstKind(kind1));
+                row.append(renderHeader(kind1));
               }
               if (index3 === 0) {
-                row.append(renderFirstKind(kind2));
+                row.append(renderHeader(kind2));
               }
-              row.append(renderFirstKind(kind3, true));
+              row.append(renderHeader(kind3, true));
 
               // const isFake = Boolean(kind3.children[0].isFake);
               // $tbody.append(
@@ -293,12 +294,12 @@ function renderTable(data) {
                 let row = $('<tr>');
                 if (index4 === 0) {
                   if (index2 === 0) {
-                    row.append(renderFirstKind(kind1));
+                    row.append(renderHeader(kind1));
                   }
                   if (index3 === 0) {
-                    row.append(renderFirstKind(kind2));
+                    row.append(renderHeader(kind2));
                   }
-                  row.append(renderFirstKind(kind3, true));
+                  row.append(renderHeader(kind3, true));
                 }
                 renderTd(row, item);
               });
@@ -309,10 +310,10 @@ function renderTable(data) {
             let row = $('<tr>');
             if (index2 === 0) {
               // 如果这是渲染 kind1 的第一行，需要额外渲染左侧表头
-              row.append(renderFirstKind(kind1));
+              row.append(renderHeader(kind1));
             }
             // 如果这是渲染 kind2 的第一行，需要额外渲染左侧表头
-            row.append(renderFirstKind(kind2, true).attr('colspan', 2));
+            row.append(renderHeader(kind2, true).attr('colspan', 2));
 
             // const isFake = Boolean(kind2.children[0].isFake);
             // $tbody.append(
@@ -329,9 +330,9 @@ function renderTable(data) {
               let row = $('<tr>');
               if (index3 === 0) {
                 if (index2 === 0) {
-                  row.append(renderFirstKind(kind1));
+                  row.append(renderHeader(kind1));
                 }
-                row.append(renderFirstKind(kind2, true).attr('colspan', 2));
+                row.append(renderHeader(kind2, true).attr('colspan', 2));
               }
               renderTd(row, item);
             });
@@ -355,25 +356,20 @@ function renderTable(data) {
 }
 
 let $modal = null;
-let $closeBtn = null;
-let $allUnfold = null;
-let $allFold = null;
 let $overlay = null;
 /** 重渲染弹窗内的表格和关闭按钮 */
 function rerender() {
   tableData = accLeafNum(tableData);
   console.log(tableData);
 
+  // 记录当前滚动高度，并清空表格的容器
+  const tableContainer = $('#pretty-table-container');
   const scrollTop = $('#pretty-table-container').scrollTop();
-  if ($modal && $closeBtn) {
-    $modal.empty();
-    $modal
-      .append($closeBtn.click(closeModal))
-      .append($allUnfold.click(allUnfold))
-      .append($allFold.click(allFold))
-      .append(renderTable(tableData));
-    $('#pretty-table-container').scrollTop(scrollTop);
-  }
+  tableContainer.empty();
+
+  // 重新渲染表格，并滚动至原位置
+  tableContainer.append(renderTable(tableData));
+  tableContainer.scrollTop(scrollTop);
 }
 
 /** 关闭弹窗事件 */
@@ -446,7 +442,7 @@ function showOverlayWithTable(tableData) {
   });
 
   // 关闭按钮
-  $closeBtn = $('<button>关闭</button>');
+  const $closeBtn = $('<button>关闭</button>');
   $closeBtn.css({
     position: 'absolute',
     top: '12px',
@@ -456,7 +452,7 @@ function showOverlayWithTable(tableData) {
   $closeBtn.click(closeModal);
 
   // 全部展开
-  $allUnfold = $('<button>全部展开</button>');
+  const $allUnfold = $('<button>全部展开</button>');
   $allUnfold.css({
     position: 'absolute',
     top: '12px',
@@ -466,7 +462,7 @@ function showOverlayWithTable(tableData) {
   $allUnfold.click(allUnfold);
 
   // 全部收纳
-  $allFold = $('<button>全部收纳</button>');
+  const $allFold = $('<button>全部收纳</button>');
   $allFold.css({
     position: 'absolute',
     top: '12px',
@@ -475,10 +471,32 @@ function showOverlayWithTable(tableData) {
   });
   $allFold.click(allFold);
 
+  // 导出图片
+  const $exportIMG = $('<button>导出图片</button>');
+  $exportIMG.css({
+    position: 'absolute',
+    top: '12px',
+    left: '180px',
+    cursor: 'pointer',
+  });
+  $exportIMG.click(exportToImage);
+
+  // 导出pdf
+  const $exportExcel = $('<button>导出Excel</button>');
+  $exportExcel.css({
+    position: 'absolute',
+    top: '12px',
+    left: '264px',
+    cursor: 'pointer',
+  });
+  $exportExcel.click(exportToExcel);
+
   $modal
     .append($closeBtn)
     .append($allUnfold)
     .append($allFold)
+    .append($exportIMG)
+    .append($exportExcel)
     .append(renderTable(tableData));
 
   $overlay.append($modal);
@@ -561,6 +579,96 @@ function mainPrettier() {
   } else {
     return false;
   }
+}
+
+/**
+ * 根据当前时间和文件类型生成唯一的文件名
+ * @param {string} fileType - 文件类型，'excel' | 'image'
+ * @returns {string} 生成的文件名，格式为：[前缀]_[YYYYMMDD_HHMMSS].[扩展名]
+ */
+function generateFilename(fileType) {
+  // 获取当前时间
+  const now = new Date();
+
+  // 格式化日期时间为 YYYYMMDD_HHMMSS
+  const formattedDateTime = [
+    now.getFullYear(),
+    String(now.getMonth() + 1).padStart(2, '0'),
+    String(now.getDate()).padStart(2, '0'),
+    '_',
+    String(now.getHours()).padStart(2, '0'),
+    String(now.getMinutes()).padStart(2, '0'),
+    String(now.getSeconds()).padStart(2, '0'),
+  ].join('');
+
+  // 定义文件类型映射表
+  const fileTypeMap = {
+    excel: { extension: 'xlsx' },
+    image: { extension: 'png' },
+  };
+
+  // 获取文件类型配置，默认为csv
+  const { extension } = fileTypeMap[fileType] || fileTypeMap.csv;
+
+  // 返回生成的文件名
+  return `计划完成情况_${formattedDateTime}.${extension}`;
+}
+
+// 导出为图片
+function exportToImage() {
+  // 创建临时容器
+  const tempContainer = $('<div>');
+  tempContainer.css({
+    position: 'fixed',
+    top: '-9999px',
+    left: '-9999px',
+    width: 'auto',
+    padding: '20px',
+    backgroundColor: 'white',
+    boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
+    borderRadius: '8px',
+  });
+
+  // 克隆表格并添加到临时容器
+  const clonedTable = renderTable(tableData, true);
+  tempContainer.append(clonedTable);
+  $('body').append(tempContainer);
+
+  // 使用html2canvas渲染表格为图片
+  html2canvas(clonedTable[0], {
+    scale: 2,
+    useCORS: true,
+    logging: false,
+  }).then((canvas) => {
+    // 转换为图片URL并下载
+    const imgData = canvas.toDataURL('image/png');
+    const test = 'test';
+    const $link = $('<a>').attr({
+      download: generateFilename('image'),
+      href: imgData,
+    });
+    $link[0].click();
+
+    // 移除临时容器
+    tempContainer.remove();
+  });
+}
+
+// 导出为Excel
+function exportToExcel() {
+  const table = renderTable(tableData, true);
+  const wb = XLSX.utils.table_to_book(table[0], { sheet: 'Sheet1' });
+  XLSX.writeFile(wb, generateFilename('excel'));
+}
+
+// 下载文件
+function downloadFile(content, filename, contentType) {
+  const a = document.createElement('a');
+  const file = new Blob([content], { type: contentType });
+  a.href = URL.createObjectURL(file);
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(a.href);
 }
 
 (function () {
