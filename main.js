@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ECNUPrettier
 // @namespace    http://santonin.top/
-// @version      2025-05-12
+// @version      1.0
 // @description  Make ECNU Website Great Again !
 // @author       Santonin
 // @match        https://applicationnewjw.ecnu.edu.cn/eams/home.action*
